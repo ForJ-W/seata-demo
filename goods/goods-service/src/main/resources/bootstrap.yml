@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: goods-service
+
+# apollo config
+apollo:
+  meta: http://localhost:8080
+  bootstrap:
+    enabled: true
+    namespaces: application
+    eagerLoad:
+      enabled: true
+    refreshInterval: 5
+app:
+  id: ${spring.application.name}
+
+# seata
+seata:
+  enabled: true
+  application-id: ${spring.application.name}
+  tx-service-group: seata_tx_group
+  enable-auto-data-source-proxy: false
+  config:
+    type: apollo
+  registry:
+    type: consul

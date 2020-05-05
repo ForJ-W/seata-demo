@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>goods-order</title>
+
+    <!-- 引入样式 -->-
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+
+    <!--    table 样式-->
+    <style>
+        .el-table .warning-row {
+            background: oldlace;
+        }
+
+        .el-table .success-row {
+            background: #f0f9eb;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+
+    <div>
+        <!--        卡片-->
+        <el-card shadow="hover">
+            <div style="text-align: right;margin-right: 5%">
+                <!--   状态切换开关-->
+                状态切换 &nbsp;
+                <el-switch
+                        v-model="statusFlag"
+                        inactive-color="#13ce66"
+                        active-color="#ff4949">
+                </el-switch>
+            </div>
+
+            <!--  商品表格-->
+            <el-table
+                    :data="goodsList"
+                    style="width: 100%"
+                    height="240"
+                    :row-class-name="tableRowClassName">
+                <el-table-column
+                        prop="name"
+                        label="名称"
+                        width="auto">
+                </el-table-column>
+                <el-table-column
+                        prop="fee"
+                        width="auto"
+                        label="价格">
+                </el-table-column>
+                <el-table-column
+                        prop="stock"
+                        width="auto"
+                        label="库存">
+                </el-table-column>
+                <el-table-column
+                        width="auto"
+                        label="商品操作">
+
+                    <!--                   商品按钮组-->
+                    <div slot-scope="scope" style="text-align: left">
+                        <el-button type="primary" @click=openUpdateGoodsDialog(scope.row)
+                                   icon="el-icon-edit"
+                                   circle>
+                        </el-button>
+                        <el-button type="primary" @click=minusCart(scope.row)
+                                   icon="el-icon-minus"
+                                   circle>
+                        </el-button>
+                        <el-button type="primary" @click=addCart(scope.row)
+                                   icon="el-icon-plus"
+                                   circle>
+                        </el-button>
+                    </div>
+                </el-table-column>
+            </el-table>
+
+            <!--            购物车按钮组-->
+            <div style="text-align: right;margin-right: 5%">
+                <h5>当前购物车数量 {{goodsCount}}</h5>
+
+                <el-button icon="el-icon-setting" @click="drawerFlag=true"
+                           style="margin-right: 5%"
+                           circle>
+                </el-button>
+
+                <!--                轻量弹框-->
+                <el-popover
+                        placement="bottom"
+                        width="320"
+                        trigger="click">
+                    <el-table :data="cartData">
+                        <el-table-column width="150" property="goodsName" label="名称"></el-table-column>
+                        <el-table-column width="100" property="goodsFee" label="价格"></el-table-column>
+                        <el-table-column width="300" property="goodsNum" label="数量"></el-table-column>
+                    </el-table>
+                    <el-button slot="reference" icon="el-icon-search" style="margin-right: 1%" circle></el-button>
+                </el-popover>
+
+                <el-button type="primary" @click=buyGoods("enableTransactional")
+                           icon="el-icon-shopping-bag-2"
+                           circle>
+                </el-button>
+
+                <el-button type="danger" @click=buyGoods("enableGlobalTransactional")
+                           icon="el-icon-shopping-bag-2"
+                           circle>
+                </el-button>
+            </div>
+
+            <!--            抽屉-->
+            <el-drawer
+                    title="订单信息"
+                    :with-header="false"
+                    :visible.sync="drawerFlag"
+                    direction="btt"
+                    size="50%"
+                    :before-close="handleClose">
+
+                <!--                        订单信息-->
+                <el-table
+                        :data="orderList"
+                        border
+                        height="220"
+                        style="width: 100%">
+                    <el-table-column
+                            prop="detail"
+                            label="订单详情"
+                    >
+                    </el-table-column>
+                    <el-table-column
+                            prop="totalFee"
+                            label="订单总金额"
+                    >
+                    </el-table-column>
+                    <el-table-column
+                            width="auto"
+                            label="订单操作">
+                        <div slot-scope="scope" style="text-align: left">
+                            <el-button type="danger" @click=deleteOrder(scope.row.id)
+                                       icon="el-icon-delete"
+                                       circle>
+                            </el-button>
+                        </div>
+                    </el-table-column>
+                </el-table>
+            </el-drawer>
+        </el-card>
+
+        <!--        商品dialog-->
+        <el-dialog title="修改商品信息" :visible.sync="updateGoodsDialogFlag">
+            <el-form :model="goods" :rules="rule" ref="updateForm">
+                <el-form-item label="商品名称" prop="name">
+                    <el-input v-model="goods.name"></el-input>
+                </el-form-item>
+
+                <el-form-item label="商品价格" prop="fee">
+                    <el-input v-model="goods.fee" type="number"></el-input>
+                </el-form-item>
+
+                <el-form-item label="商品库存" prop="stock">
+                    <el-input v-model="goods.stock" type="number"></el-input>
+                </el-form-item>
+            </el-form>
+
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="updateGoodsDialogFlag = false">取 消</el-button>
+                <el-button type="primary" @click="updateGoods">确 定</el-button>
+            </div>
+        </el-dialog>
+    </div>
+</div>
+
+
+</body>
+
+<!--引入jquery-->
+<script src="https://upcdn.b0.upaiyun.com/libs/jquery/jquery-2.0.2.min.js"></script>
+<!--引入axios-->
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<!--引入vue-->
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<!-- 引入组件库 -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+
+<script>
+
+    let app = new Vue({
+        el: "#app",
+
+        data: {
+
+            //表单校验规则
+            rule: {
+                name: [{required: true, message: '请输入名称', trigger: 'blur'}],
+                fee: [{required: true, message: '请输入价格', trigger: 'blur'}],
+                stock: [{required: true, message: '请输入库存', trigger: 'blur'}]
+
+            },
+
+            //状态标记
+            statusFlag: true,
+
+            //抽屉标记
+            drawerFlag: false,
+
+            //商品展示数据
+            goodsList: [],
+
+            //订单展示数据
+            orderList: [],
+
+            //购物车信息
+            cart: [],
+
+            //购物车商品数据
+            cartData: [],
+
+            //商品数量
+            goodsCount: 0,
+
+            //修改商品dialog标记
+            updateGoodsDialogFlag: false,
+
+            //商品对象
+            goods: {
+                name: "",
+                fee: 0,
+                stock: 0
+            }
+        },
+
+        // 钩子
+        created() {
+
+            this.loadData();
+        },
+
+        //监控
+        watch: {
+
+            //监听修改商品信息弹框
+            updateGoodsDialogFlag(val) {
+
+                if (!val) {
+
+                    //清除校验
+                    this.$refs['updateForm'].resetFields();
+                }
+            },
+
+            //监听状态切换
+            statusFlag(flag) {
+
+                axios.post("http://localhost:9001/order/toggleStatus/" + flag).then(({data: d}) => {
+
+                    if (flag) {
+
+                        this.$message.error("切换为异常状态");
+                    } else {
+
+                        this.$message.success("切换为正常状态");
+                    }
+                });
+            }
+        },
+
+        //方法
+        methods: {
+
+            //修改商品信息
+            updateGoods() {
+
+                //校验
+                this.$refs['updateForm'].validate((valid) => {
+
+                    if (valid) {
+                        axios.post("http://localhost:9002/goods/updateGoods", this.goods).then(({data: d}) => {
+
+                            this.$message.success('修改成功');
+                            this.updateGoodsDialogFlag = false;
+                        }).catch(() => {
+
+                            this.$message.error('修改失败');
+                            this.loadData();
+                        });
+                    }
+                });
+            },
+
+            //打开修改商品dialog
+            openUpdateGoodsDialog(goods) {
+
+                this.updateGoodsDialogFlag = true;
+                this.goods = goods;
+            },
+
+            //商品订单数据
+            deleteOrder(orderId) {
+
+                this.$confirm('删除订单', ' 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+
+                    axios.delete("http://localhost:9001/order/" + orderId).then(({data: d}) => {
+
+                        this.loadData();
+                        this.$message.success('删除成功');
+                    }).catch(() => {
+
+                        this.$message.error('删除失败');
+                        this.loadData();
+                    })
+                }).catch(() => {
+                    this.$message('已取消删除');
+                });
+            },
+
+            // 关闭抽屉
+            handleClose() {
+
+                this.drawerFlag = false;
+            },
+
+            //添加购物车
+            addCart(goods) {
+
+                // debugger;
+                if (this.cart.length == 0) {
+
+                    this.cart.push({goodsId: goods.id, goodsNum: 1});
+                    this.cartData.push({goodsName: goods.name, goodsFee: goods.fee, goodsNum: 1});
+                } else {
+
+                    let flag = false;
+
+                    this.cart.map((item) => {
+
+                        flag = item.goodsId == goods.id;
+                        if (flag) {
+
+                            return item.goodsNum = item.goodsNum + 1;
+                        }
+                    });
+
+                    //当传入的商品不存在于数组里时新增
+                    if (!flag) {
+
+                        this.cart.push({goodsId: goods.id, goodsNum: 1});
+                        this.cartData.push({goodsName: goods.name, goodsFee: goods.fee, goodsNum: 1});
+                    }
+                }
+
+                this.countSum();
+            },
+
+            // 计算购物车商品数量
+            countSum() {
+
+                this.cart.forEach((item, index) => {
+
+                    Object.assign(this.cartData[index], item);
+                });
+                // debugger;
+                let sum = 0;
+                this.cart.forEach((item) => {
+
+                    // debugger;
+                    sum += item.goodsNum;
+                });
+
+                this.goodsCount = sum;
+                console.log(this.cart);
+                console.log(this.cartData);
+            },
+
+            //移除购物车中商品
+            minusCart(goods) {
+
+                if (this.cart.length > 0) {
+
+                    this.cart.map((item, index) => {
+
+                        if (item.goodsId == goods.id && item.goodsNum > 0) {
+
+                            if (item.goodsNum - 1 == 0) {
+
+                                this.cartData.splice(index, 1)
+                                return this.cart.splice(index, 1);
+                            }
+                            return item.goodsNum = item.goodsNum - 1;
+                        }
+                    });
+                }
+
+                this.countSum();
+            },
+
+            //下单
+            buyGoods(url) {
+
+                if (this.cart.length == 0) {
+
+                    this.$message('当前购物车没有商品哦~');
+                    return;
+                }
+                // debugger;
+                // console.log(url);
+                this.$confirm('提交购物车订单', ' 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+
+                    axios.post("http://localhost:9001/order/" + url, this.cart).then(({data: d}) => {
+
+                        this.loadData();
+                        this.$message.success('下单成功');
+                    }).catch(() => {
+
+                        this.$message.error('下单失败');
+                        this.loadData();
+                    })
+                }).catch(() => {
+                    this.$message('已取消购买');
+                });
+
+            },
+
+            //加载展示商品与订单数据
+            loadData() {
+
+                axios.post("http://localhost:9002/goods/listGoods").then(({data: d}) => {
+
+                    if (d) {
+
+                        this.goodsList = d;
+                    }
+                });
+
+                axios.post("http://localhost:9001/order/listOrder").then(({data: d}) => {
+
+                    this.$notify.info({
+                        title: '提示',
+                        message: '当前订单数量: ' + d.length,
+                        position: 'bottom-right',
+                        duration: 3000
+                    });
+                    if (d) {
+
+                        this.orderList = d;
+                    }
+                });
+            },
+
+            //表格样式切换
+            tableRowClassName({row, rowIndex}) {
+                if (rowIndex % 2 == 0) {
+                    return 'warning-row';
+                } else {
+                    return 'success-row';
+                }
+                return '';
+            }
+        }
+    })
+</script>
+</html>
