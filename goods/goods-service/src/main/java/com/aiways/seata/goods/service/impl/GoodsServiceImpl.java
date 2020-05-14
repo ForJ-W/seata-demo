@@ -3,6 +3,7 @@ package com.aiways.seata.goods.service.impl;
 import com.aiways.seata.goods.mapper.GoodsMapper;
 import com.aiways.seata.goods.pojo.Goods;
 import com.aiways.seata.goods.service.GoodsService;
+import io.seata.spring.annotation.GlobalTransactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,7 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
+    @GlobalTransactional
     public Goods getGoods(Integer id) {
 
         return goodsMapper.getGoods(id);
@@ -37,6 +39,7 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
+    @GlobalTransactional
     public void updateGoods(Goods goods) {
 
         goodsMapper.updateGoods(goods);

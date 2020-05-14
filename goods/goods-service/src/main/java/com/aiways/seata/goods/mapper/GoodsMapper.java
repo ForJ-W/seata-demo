@@ -15,7 +15,7 @@ public interface GoodsMapper {
     @Update("update tb_goods set stock = stock - #{num} where id = #{id}")
     Integer minusStock(@Param("num") Integer num, @Param("id") Integer id);
 
-    @Select("select * from tb_goods where id=#{id}")
+    @Select("select * from tb_goods where id=#{id} for update")
     Goods getGoods(@Param("id") Integer id);
 
     @Select("select * from tb_goods")

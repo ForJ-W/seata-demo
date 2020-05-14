@@ -226,11 +226,7 @@
             updateGoodsDialogFlag: false,
 
             //商品对象
-            goods: {
-                name: "",
-                fee: 0,
-                stock: 0
-            }
+            goods: {}
         },
 
         // 钩子
@@ -282,6 +278,7 @@
 
                             this.$message.success('修改成功');
                             this.updateGoodsDialogFlag = false;
+                            this.loadData();
                         }).catch(() => {
 
                             this.$message.error('修改失败');
