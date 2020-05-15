@@ -14,13 +14,3 @@ apollo:
 env: DEV
 app:
   id: ${spring.application.name}
-
-# seata
-seata:
-  enabled: true
-  application-id: ${spring.application.name}
-  tx-service-group: seata_tx_group
-  config:
-    type: apollo
-  registry:
-    type: consul
