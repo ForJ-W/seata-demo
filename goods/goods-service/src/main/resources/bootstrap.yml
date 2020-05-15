@@ -19,7 +19,6 @@ seata:
   enabled: true
   application-id: ${spring.application.name}
   tx-service-group: seata_tx_group
-  #  enable-auto-data-source-proxy: false
   config:
     type: apollo
   registry:
