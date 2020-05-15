@@ -26,7 +26,7 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
-    @GlobalTransactional
+//    @GlobalTransactional
     public Goods getGoods(Integer id) {
 
         return goodsMapper.getGoods(id);
@@ -39,7 +39,7 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
-    @GlobalTransactional
+//    @GlobalTransactional
     public void updateGoods(Goods goods) {
 
         goodsMapper.updateGoods(goods);

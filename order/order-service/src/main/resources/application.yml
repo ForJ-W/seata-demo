@@ -1,162 +1,33 @@
-#spring:
-#  application:
-#    name: order-service
-#  datasource:
-#    driver-class-name: com.mysql.jdbc.Driver
-#    url: jdbc:mysql://localhost:3306/seata_demo
-#    username: root
-#    password: 3009
-#  cloud:
-#    consul:
-#      discovery:
-#        hostname: localhost
-#
-#management:
-#  endpoints:
-#    web:
-#      exposure:
-#        include: "*"
-#
-#server:
-#  port: 9001
-#
-#mybatis:
-#  configuration:
-#    map-underscore-to-camel-case: true
-#
-#mapper:
-#  wrap-keyword: '`{0}`'
-#
-#
-#logging:
-#  level:
-#    com.aiway.seata: debug
-#
-##seata:
-##  application-id: ${spring.application.name}
-##  tx-service-group: order_tx_group
-##  service:
-##    vgroupMapping:
-##      order_tx_group: order
-##  client:
-##    support:
-##      spring:
-##        datasource-autoproxy: false
-##  config:
-##    type: file
-##
-##  registry:
-##    type: consul
-##    consul:
-##      server-addr: 127.0.0.1:8500
-##      cluster: seata-service
-#
-## apollo config
-##apollo:
-##  meta: https://localhost:8080
-##  bootstrap:
-##    enabled: true
-##    namespaces: application
-##    eagerLoad:
-##      enabled: true
-##    autoUpdateInjectedSpringProperties: true
-##    refreshInterval: 5 # 配置拉取周期,5分钟
-##  cacheDir: /app/apollo-cache/${spring.application.name}-cache-dir
-##app:
-##  id: ${spring.application.name}
-#
-#
-#
-##  cloud:
-##    consul:
-#      #配置consul服务器的host
-##      host: localhost
-#      #配置端口
-##      port: 8500
-##      discovery:
-##        hostname: localhost
-##        #是否启用服务发现
-##        enabled: true
-##        #配置健康检查路径
-##        health-check-path: /actuator/health
-##        #配置健康检查时间间隔
-##        health-check-interval: 15s
-##        #配置实例id
-##        instance-id: ${spring.application.name}:${vcap.application.instance_id:${spring.application.instance_id:${random.value}}}
-##        #配置服务注册
-##        register: true
-##        #服务停止时取消注册，http://www.imooc.com/article/286883?block_id=tuijian_wz
-##        deregister: true
-##        #表示注册时使用ip而不是hostname
-##        prefer-ip-address: true
-##        #健康检查失败多长时间取消注册
-##        health-check-critical-timeout: 30s
-##  profiles:
-##    active: dev
-#
-#seata:
-#  enabled: true
-#  application-id: ${spring.application.name}
-#  tx-service-group: order_tx_group
-#  enable-auto-data-source-proxy: true
-#  use-jdk-proxy: false
-#  excludes-for-auto-proxying: firstClassNameForExclude,secondClassNameForExclude
-#  client:
-#    rm:
-#      async-commit-buffer-limit: 1000
-#      report-retry-count: 5
-#      table-meta-check-enable: false
-#      report-success-enable: false
-#      saga-branch-register-enable: false
-#      lock:
-#        retry-interval: 10
-#        retry-times: 30
-#        retry-policy-branch-rollback-on-conflict: true
-#    tm:
-#      commit-retry-count: 5
-#      rollback-retry-count: 5
-#    undo:
-#      data-validation: true
-#      log-serialization: jackson
-#      log-table: undo_log
-#    log:
-#      exceptionRate: 100
-#    support:
-#      spring:
-#        datasource-autoproxy: false
-#  service:
-#    vgroup-mapping:
-#      my_test_tx_group: default
-#    grouplist:
-#      default: 127.0.0.1:8091
-#    enable-degrade: false
-#    disable-global-transaction: false
-#
-#  transport:
-#    shutdown:
-#      wait: 3
-#    thread-factory:
-#      boss-thread-prefix: NettyBoss
-#      worker-thread-prefix: NettyServerNIOWorker
-#      server-executor-thread-prefix: NettyServerBizHandler
-#      share-boss-worker: false
-#      client-selector-thread-prefix: NettyClientSelector
-#      client-selector-thread-size: 1
-#      client-worker-thread-prefix: NettyClientWorkerThread
-#      worker-thread-size: default
-#      boss-thread-size: 1
-#    type: TCP
-#    server: NIO
-#    heartbeat: true
-#    serialization: seata
-#    compressor: none
-#    enable-client-batch-send-request: true
-#  config:
-#    type: apollo
-#    apollo:
-#      apollo-meta: http://localhost:8801
-#  registry:
-#    type: consul
-#    consul:
-#      server-addr: 127.0.0.1:8500
-#      cluster: seata-demo
+spring:
+  application:
+    name: order-service
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/seata_demo
+    username: root
+    password: 3009
+  cloud:
+    consul:
+      discovery:
+        hostname: localhost
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+server:
+  port: 9001
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+
+mapper:
+  wrap-keyword: '`{0}`'
+
+
+logging:
+  level:
+    com.aiway.seata: debug

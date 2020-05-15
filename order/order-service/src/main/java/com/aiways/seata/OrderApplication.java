@@ -15,7 +15,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @MapperScan("com.aiways.seata.order.mapper")
 @EnableDiscoveryClient
 @EnableFeignClients
-@EnableApolloConfig
+//@EnableApolloConfig
 public class OrderApplication {
 
     public static void main(String[] args) {
